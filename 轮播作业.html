@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>轮播作业</title>
+	<style type="text/css">
+		*{
+			padding: 0;
+			margin:0;
+			text-decoration: none;
+		}
+		body
+		{
+
+			padding: 20px;
+		}
+		#container
+		{   margin:50px auto;
+			width: 600px;
+			height: 400px;
+			border: 3px solid #333;
+			overflow: hidden;
+			position: relative;
+		}
+		#list
+		{
+			width: 4200px;
+			height: 400px;
+			position: absolute;
+            z-index: 1;
+            /*font-size: 0;*/
+
+		}
+		#list img
+		{
+			/*float: left;*/
+			/*display: block;*/
+			float: left;
+		}
+		#buttons
+		{
+             position: absolute;
+             height: 10px;
+             width: 100px;
+             z-index: 2;
+             bottom:20px;
+             left:250px;
+             /*border:1px solid black;*/
+		}
+		#buttons span
+		{
+			cursor: pointer;
+			float: left;
+			border:1px solid #fff;
+			width: 10px;
+			height: 10px;
+			border-radius:50%;
+			background:#333;
+			margin-right: 5px; 
+		}
+		#buttons .on
+		{
+			background-color: orangered;
+		}
+		.arrow
+		{
+			cursor: pointer;
+			display: none;
+			line-height: 39px;
+			text-align: center;
+			font-size: 36px;
+			font-weight: bold;
+			width: 40px;
+			height: 40px;
+			position: absolute;
+			z-index: 2;
+			top: 180px;
+			background-color: RGBA(0,0,0,.3); 
+			color: #fff;
+		}
+			.arrow:hover 
+			{ 
+				background-color: RGBA(0,0,0,.7);
+			}
+            #container:hover .arrow 
+            { 
+            	display: block;
+            }
+            #prev 
+            { 
+            	left: 20px;
+            }
+            #next 
+            { 
+            	right: 20px;
+            }
+		
+
+	</style>
+</head>
+<body>
+<div id="container">
+	<div id="list" style="left:-600px;">
+		<img src="image/5.jpg" alt="1">
+		<img src="image/1.jpg" alt="1">
+		<img src="image/2.jpg" alt="2">
+		<img src="image/3.jpg" alt="3">
+		<img src="image/4.jpg" alt="4">
+		<img src="image/5.jpg" alt="5">
+		<img src="image/1.jpg" alt="5">
+	</div>
+	<div id="buttons">
+		<span index="1" class="on"></span>
+		<span index="2" ></span>
+		<span index="3" ></span>
+		<span index="4" ></span>
+		<span index="5" ></span>
+	</div>
+	<a href="javascript:;" id="prev" class="arrow">&lt;</a>
+	<a href="javascript:;" id="next" class="arrow">&gt;</a>
+</div>
+</body>
+<script type="text/javascript">
+	//获取需要的标签
+	var container=document.querySelector('#container');
+	var list=document.querySelector('#list');
+	var buttons=document.getElementById('buttons').getElementsByTagName('span');
+	var prev=document.querySelector('#prev');
+	var next=document.querySelector('#next');
+	//span的自定义属性
+	var index=1;
+	//防止多次添加点击事件,使动画顺序变乱
+	var animated=false;
+	//为定时器命名
+	var timer;
+	//动画函数
+	function animate(step)
+	{
+		animated=true;
+		//图片的偏移量
+		var newleft=parseInt(list.style.left)+step;
+		var time=300; //位移总时间
+        var interval=10;//位移的时间间隔
+        var speed=step/(time/interval);//位移速度,每次位移量
+        // console.log(newleft);
+        function go()
+        {
+        	//判断移动的方向
+            if (speed<0&&parseInt(list.style.left)>newleft||speed>0&&parseInt(list.style.left)<newleft) 
+            {
+                //添加当前的速度,实现图片运动起来
+            	list.style.left = parseInt(list.style.left)+speed+'px';
+            	//用递归实现连续调用go函数,使图片连续动画
+            	setTimeout(go, interval);
+            }
+            else 
+            {
+            	animated=false;
+                list.style.left=newleft+'px';
+                //判断图片移动是否超出范围
+                if (newleft>-600) 
+                {
+        	        list.style.left=-3000+'px';
+                }
+                if(newleft<-3000)
+                {
+        	        list.style.left=-600+'px';
+                }
+            }	
+           
+        } 
+        //调用函数
+        go();
+        
+	}
+	function f1()
+	{
+		  index+=1;
+		  if (index>=6) 
+		  {
+		  	index=1;
+		  }
+		  showButtons();
+		  if (animated==false) 
+		  {
+		  	animate(-600);
+		  }
+          
+	}
+	function f2()
+	{
+
+          index-=1;
+          if (index<=0) 
+          {
+          	index=5;
+          }
+          showButtons();
+          if (animated==false) 
+          {
+          	animate(600);
+          }
+          
+	}
+	//使用定时器,让图片自动运动
+	function play()
+	{
+          timer=setInterval(function()
+          {
+              f1();
+          },3000)
+	}
+
+	function stop()
+	{
+		clearInterval(timer);
+	}
+	//改变下面圆圈的值
+	function showButtons()
+	{
+		//遍历数组,进行排他
+		for (var i = 0; i < buttons.length; i++) 
+		{
+			if (buttons[i].className=='on') 
+				{
+                      buttons[i].className='';
+				}		
+			}
+	    //为当前的下标赋值
+          buttons[index-1].className='on';
+	}
+    //向左跳转
+	prev.onclick=f2;
+	//向右跳转
+	next.onclick=f1;
+	for (var i = 0; i < buttons.length; i++) {
+		buttons[i].onclick=function()
+		{
+			//优化代码，点击当前的index时候,不执行本段代码
+			if (this.className=='on') 
+			{
+				return;
+			}
+			//记录要跳转的index
+			var myIndex=parseInt(this.getAttribute('index'));
+			//计算需滑动的长度,index代表本身的图片的index
+			var offset=-600*(myIndex-index);
+			// console.log(offset);
+			//调用函数实行跳转
+			animate(offset);
+			//改变buttons的值
+			index=myIndex;
+		    showButtons();
+		}
+	}
+	//判断鼠标移进,移出
+	container.onmouseenter=stop;
+	container.onmouseleave=play;
+	//调用定时器,使图片运动起来
+	play();
+
+</script>
+</html>
